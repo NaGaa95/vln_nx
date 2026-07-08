@@ -1,6 +1,6 @@
 <div align=center>
 
-<img src="extras/banner.png" alt="Banner" width="40%">
+<img src="extras/banner.png" alt="Banner" width="20%">
 
 </div>
 <h1 align=center>Very Little Nightmares — Nintendo Switch port</h1>
