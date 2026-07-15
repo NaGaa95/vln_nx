@@ -389,10 +389,9 @@ int main(int argc, char *argv[]) {
     debugPrintf("[cfg] portrait=%d (1=ROT90 default, 2=ROT270)\n", config.portrait);
   }
 
-  /* First-run data staging: unpack the OBB and merge the split data.unity3d halves
-   * on-device so the user just drops the raw .obb next to the .nro. See obb_stage.c. */
+  /* Use complete loose assets directly, or stage the original split APK + OBB layout. */
   if (obb_stage(VLN_OBB_NAME) != 0)
-    fatal_error("Game data not ready.\n\nFirst run needs the OBB:\n  %s\nin %s (or a pre-staged assets/bin/Data/data.unity3d).\nAlso ensure ~500 MB free on the SD.", VLN_OBB_NAME, DATA_ROOT);
+    fatal_error("Game data not ready.\n\nPlace either complete extracted assets in:\n  %s/assets\n\nor the split-release OBB:\n  %s\n\nSee README.md for the required layout.", DATA_ROOT, VLN_OBB_NAME);
 
   /* Force libunity to re-extract il2cpp resources every boot: our shim never flushes
    * a writable file-backed mmap to disk, so a previously-extracted global-metadata.dat

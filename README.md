@@ -17,10 +17,10 @@ Create a folder for the game on your SD card, `/switch/vln_nx/`, and place:
 1. `vln_nx.nro`
 2. `libmain.so`, `libunity.so`, `libil2cpp.so` — extracted from the APK's
    `lib/arm64-v8a/` folder.
-3. `assets/` — the **contents** of the APK's `assets/` folder (the il2cpp
-   metadata, `boot.config`, the small `data.unity3d` stub, …).
-4. `main.147.eu.bandainamcoent.verylittlenightmares.obb` — the game's OBB
-   expansion file, dropped in as-is.
+3. `assets/` — the **contents** of the APK or extracted dump's `assets/`
+   folder.
+4. `main.147.eu.bandainamcoent.verylittlenightmares.obb`. 
+   If the extracted dump already includes the large complete file (about 424 MB) and the loose `sharedassets*.resource` files, the OBB install part will be skipped.
 
 ```
 /switch/vln_nx/
@@ -28,12 +28,12 @@ Create a folder for the game on your SD card, `/switch/vln_nx/`, and place:
   libmain.so  libunity.so  libil2cpp.so
   assets/
     bin/Data/ ...
-  main.147.eu.bandainamcoent.verylittlenightmares.obb
+  main.147.eu.bandainamcoent.verylittlenightmares.obb  # only for split dumps
 ```
 
-On **first launch** the port unpacks the OBB and merges the game data on the
-console then deletes the OBB to reclaim space. 
-Every later boot is instant.
+On **first launch**, the port uses complete extracted assets directly. When an
+OBB is present, it unpacks and merges the game data, then deletes the OBB to
+reclaim space.
 
 Launch with a **game override** (hold R while starting a title) or a
 forwarder.

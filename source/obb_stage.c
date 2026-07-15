@@ -1,11 +1,13 @@
-/* obb_stage.c -- first-boot, on-device staging of the Very Little Nightmares OBB.
+/* obb_stage.c -- game-data readiness and first-boot OBB staging.
  *
  * VLN is a Unity "split application binary": the APK ships a small data.unity3d STUB
  * and a ~529MB OBB (a STORE/uncompressed ZIP) whose data.unity3d holds the content
  * half. Neither boots alone. This unpacks the OBB flat and merges the two
  * data.unity3d halves on-device (what the PC tools/stage_sd.py does), keeping every
  * data block verbatim and rebuilding only the uncompressed blocksInfo -- so we need
- * an LZ4 decompressor for the inputs, never a compressor. Paths are CWD-relative.
+ * an LZ4 decompressor for the inputs, never a compressor. Some dumps already contain
+ * the complete, extracted assets tree; those are accepted as-is and skip OBB staging.
+ * Paths are CWD-relative.
  */
 
 #include <stdio.h>
@@ -335,11 +337,23 @@ static int obb_install(const char *obb_name){
   return 0;
 }
 
+static int extracted_assets_ready(void){
+  struct stat st;
+  if (stat("assets/bin/Data/data.unity3d", &st) != 0 || st.st_size <= 100*1024*1024)
+    return 0;                                         /* small file is the split APK stub */
+  if (stat("assets/bin/Data/Managed/Metadata/global-metadata.dat", &st) != 0 || st.st_size == 0)
+    return 0;
+  if (stat("assets/bin/Data/boot.config", &st) != 0 || st.st_size == 0)
+    return 0;
+  return 1;
+}
+
 int obb_stage(const char *obb_name){
   struct stat st;
-  if (stat("assets/bin/Data/data.unity3d",&st)==0 && st.st_size > 100*1024*1024){
+  if (extracted_assets_ready()){
+    debugPrintf("[obb] complete extracted assets detected; skipping OBB install\n");
     unlink("assets/bin/Data/data.unity3d.apkstub"); unlink(obb_name);
-    return 0;                                          /* already staged */
+    return 0;
   }
   if (stat(obb_name,&st) != 0) return -1;              /* no data and no OBB */
   g_total = (uint64_t)st.st_size; g_done = g_logged = 0;
